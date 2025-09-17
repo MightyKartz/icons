@@ -851,10 +851,18 @@ extension ExportService {
 extension ExportService {
     /// 将 SwiftUI.Color 转换为 NSColor
     fileprivate static func nsColor(from color: Color) -> NSColor? {
-        if let cg = color.cgColor {
-            return NSColor(cgColor: cg)
+        // 使用更安全的方法从 SwiftUI.Color 创建 NSColor
+        let nsColor = NSColor(color)
+        // 确保颜色在 RGB 颜色空间中，以防止后续操作中的颜色空间问题
+        guard let rgbColor = nsColor.usingColorSpace(.sRGB) else {
+            // 如果转换失败，尝试使用 cgColor
+            if let cg = color.cgColor {
+                let fallbackColor = NSColor(cgColor: cg)
+                return fallbackColor.usingColorSpace(.sRGB) ?? fallbackColor
+            }
+            return nil
         }
-        return nil
+        return rgbColor
     }
 }
 
