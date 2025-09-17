@@ -47,12 +47,6 @@ struct SettingsView: View {
     @AppStorage("showPreviewInSidebar") private var showPreviewInSidebar: Bool = true
     @AppStorage("gridColumns") private var gridColumns: Int = 4
     @AppStorage("showThumbnails") private var showThumbnails: Bool = true
-
-    // 开发者测试选项 - 仅在DEBUG模式下可用
-    #if DEBUG
-    @AppStorage("freeUnlimitedUsage") private var freeUnlimitedUsage: Bool = false
-    @AppStorage("isProUser") private var isProUser: Bool = false
-    #endif
     
     // MARK: - 视图主体
     
@@ -94,7 +88,7 @@ struct SettingsView: View {
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
-        .background(Color(NSColor.controlBackgroundColor))
+        .background(Color(NSColor.windowBackgroundColor))
         .overlay(
             Divider(),
             alignment: .bottom
@@ -170,32 +164,8 @@ struct SettingsView: View {
             // 保存到历史记录
             Toggle("自动保存到历史记录", isOn: $saveToHistory)
 
-            #if DEBUG
             // 开发者测试选项 - 仅在DEBUG模式下可见
-            Divider()
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("开发者测试选项")
-                    .font(.headline)
-                    .foregroundColor(.blue)
-
-                // 免费用户无限次使用
-                Toggle("免费用户无限次使用", isOn: $freeUnlimitedUsage)
-
-                // PRO用户切换
-                Toggle("启用PRO功能", isOn: $isProUser)
-                    .onChange(of: isProUser) { newValue in
-                        // 当切换PRO状态时，更新用户订阅信息
-                        if newValue {
-                            // 模拟升级到PRO
-                            print("用户已升级到PRO")
-                        } else {
-                            // 模拟降级到免费用户
-                            print("用户已降级到免费")
-                        }
-                    }
-            }
-            #endif
+            DeveloperOptionsView()
         }
     }
     
@@ -420,6 +390,19 @@ struct SettingsView: View {
         @EnvironmentObject private var interactionService: InteractionService
         @State private var showingFolderPicker = false
         
+        // 本地状态变量
+        @State private var localDefaultExportFormat: ExportFormat = .png
+        @State private var localDefaultExportSize: ExportSize = .size1024
+        @State private var localCustomExportWidth: Int = 1024
+        @State private var localCustomExportHeight: Int = 1024
+        @State private var localAutoCreateSubfolders: Bool = true
+        @State private var localIncludeMetadata: Bool = true
+        @State private var localGenerateThumbnails: Bool = false
+        @State private var localPreserveOriginalNames: Bool = false
+        @State private var localFilenameTemplate: String = "icon_{name}_{size}"
+        @State private var localPngCompressionLevel: Double = 0.8
+        @State private var localJpegQuality: Double = 0.9
+        
         var body: some View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("导出设置")
@@ -431,7 +414,7 @@ struct SettingsView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                 
-                    Picker("默认格式", selection: $appState.defaultExportFormat) {
+                    Picker("默认格式", selection: $localDefaultExportFormat) {
                         ForEach(ExportFormat.allCases) { format in
                             HStack {
                                 Image(systemName: format.icon)
@@ -447,6 +430,11 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: 300)
+                    .onChange(of: localDefaultExportFormat) { newValue in
+                        Task { @MainActor in
+                            appState.defaultExportFormat = newValue
+                        }
+                    }
                 }
                 
                 Divider()
@@ -457,7 +445,7 @@ struct SettingsView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                     
-                    Picker("默认尺寸", selection: $appState.defaultExportSize) {
+                    Picker("默认尺寸", selection: $localDefaultExportSize) {
                         ForEach(ExportSize.allCases) { size in
                             VStack(alignment: .leading) {
                                 Text(size.displayName)
@@ -470,17 +458,32 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .frame(maxWidth: 300)
+                    .onChange(of: localDefaultExportSize) { newValue in
+                        Task { @MainActor in
+                            appState.defaultExportSize = newValue
+                        }
+                    }
                     
-                    if appState.defaultExportSize == .custom {
+                    if localDefaultExportSize == .custom {
                         HStack {
                             Text("自定义尺寸:")
-                            TextField("宽度", value: $appState.customExportWidth, format: .number)
+                            TextField("宽度", value: $localCustomExportWidth, format: .number)
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 80)
+                                .onChange(of: localCustomExportWidth) { newValue in
+                                    Task { @MainActor in
+                                        appState.customExportWidth = newValue
+                                    }
+                                }
                             Text("×")
-                            TextField("高度", value: $appState.customExportHeight, format: .number)
+                            TextField("高度", value: $localCustomExportHeight, format: .number)
                                 .textFieldStyle(.roundedBorder)
                                 .frame(width: 80)
+                                .onChange(of: localCustomExportHeight) { newValue in
+                                    Task { @MainActor in
+                                        appState.customExportHeight = newValue
+                                    }
+                                }
                             Text("px")
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -529,16 +532,41 @@ struct SettingsView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                     
-                    Toggle("自动创建子文件夹", isOn: $appState.autoCreateSubfolders)
-                    Toggle("导出时包含元数据", isOn: $appState.includeMetadata)
-                    Toggle("生成缩略图", isOn: $appState.generateThumbnails)
-                    Toggle("保留原始文件名", isOn: $appState.preserveOriginalNames)
+                    Toggle("自动创建子文件夹", isOn: $localAutoCreateSubfolders)
+                        .onChange(of: localAutoCreateSubfolders) { newValue in
+                            Task { @MainActor in
+                                appState.autoCreateSubfolders = newValue
+                            }
+                        }
+                    Toggle("导出时包含元数据", isOn: $localIncludeMetadata)
+                        .onChange(of: localIncludeMetadata) { newValue in
+                            Task { @MainActor in
+                                appState.includeMetadata = newValue
+                            }
+                        }
+                    Toggle("生成缩略图", isOn: $localGenerateThumbnails)
+                        .onChange(of: localGenerateThumbnails) { newValue in
+                            Task { @MainActor in
+                                appState.generateThumbnails = newValue
+                            }
+                        }
+                    Toggle("保留原始文件名", isOn: $localPreserveOriginalNames)
+                        .onChange(of: localPreserveOriginalNames) { newValue in
+                            Task { @MainActor in
+                                appState.preserveOriginalNames = newValue
+                            }
+                        }
                     
                     HStack {
                         Text("文件名格式:")
-                        TextField("例如: icon_{name}_{size}", text: $appState.filenameTemplate)
+                        TextField("例如: icon_{name}_{size}", text: $localFilenameTemplate)
                             .textFieldStyle(.roundedBorder)
                             .frame(maxWidth: 250)
+                            .onChange(of: localFilenameTemplate) { newValue in
+                                Task { @MainActor in
+                                    appState.filenameTemplate = newValue
+                                }
+                            }
                         Spacer()
                     }
                 }
@@ -553,8 +581,13 @@ struct SettingsView: View {
                     
                     HStack {
                         Text("PNG 压缩:")
-                        Slider(value: $appState.pngCompressionLevel, in: 0...1, step: 0.1)
-                        Text("\(Int(appState.pngCompressionLevel * 100))%")
+                        Slider(value: $localPngCompressionLevel, in: 0...1, step: 0.1)
+                            .onChange(of: localPngCompressionLevel) { newValue in
+                                Task { @MainActor in
+                                    appState.pngCompressionLevel = newValue
+                                }
+                            }
+                        Text("\(Int(localPngCompressionLevel * 100))%")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .frame(width: 40)
@@ -562,8 +595,13 @@ struct SettingsView: View {
                     
                     HStack {
                         Text("JPEG 质量:")
-                        Slider(value: $appState.jpegQuality, in: 0...1, step: 0.1)
-                        Text("\(Int(appState.jpegQuality * 100))%")
+                        Slider(value: $localJpegQuality, in: 0...1, step: 0.1)
+                            .onChange(of: localJpegQuality) { newValue in
+                                Task { @MainActor in
+                                    appState.jpegQuality = newValue
+                                }
+                            }
+                        Text("\(Int(localJpegQuality * 100))%")
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .frame(width: 40)
@@ -587,6 +625,20 @@ struct SettingsView: View {
                     print("文件夹选择失败: \(error.localizedDescription)")
                 }
             }
+            .onAppear {
+                // 初始化本地状态变量
+                localDefaultExportFormat = appState.defaultExportFormat
+                localDefaultExportSize = appState.defaultExportSize
+                localCustomExportWidth = appState.customExportWidth
+                localCustomExportHeight = appState.customExportHeight
+                localAutoCreateSubfolders = appState.autoCreateSubfolders
+                localIncludeMetadata = appState.includeMetadata
+                localGenerateThumbnails = appState.generateThumbnails
+                localPreserveOriginalNames = appState.preserveOriginalNames
+                localFilenameTemplate = appState.filenameTemplate
+                localPngCompressionLevel = appState.pngCompressionLevel
+                localJpegQuality = appState.jpegQuality
+            }
         }
     }
     
@@ -594,6 +646,12 @@ struct SettingsView: View {
     struct GenerationSettingsPanel: View {
         @EnvironmentObject private var appState: AppState
         @EnvironmentObject private var interactionService: InteractionService
+        
+        // 本地状态变量，避免在视图更新期间直接修改AppState
+        @State private var localImageQuality: ImageQuality = .high
+        @State private var localGenerationCount: Int = 1
+        @State private var localEnableBatchGeneration: Bool = false
+        @State private var localBatchSize: Int = 2
 
         var body: some View {
             VStack(alignment: .leading, spacing: 24) {
@@ -620,11 +678,12 @@ struct SettingsView: View {
                         .font(.headline)
                         .fontWeight(.medium)
 
-                    Picker("图片质量", selection: $appState.imageQuality) {
+                    Picker("图片质量", selection: $localImageQuality) {
                         ForEach(ImageQuality.allCases) { quality in
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(quality.displayName)
+                                Text(quality.rawValue)
                                     .font(.callout)
+                                    .fontWeight(.medium)
                                 Text(quality.description)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
@@ -635,6 +694,11 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.segmented)
                     .frame(maxWidth: 400)
+                    .onChange(of: localImageQuality) { newValue in
+                        Task { @MainActor in
+                            appState.imageQuality = newValue
+                        }
+                    }
                 }
                 .padding(.vertical, 4)
 
@@ -648,10 +712,13 @@ struct SettingsView: View {
                         Text("生成数量:")
                             .frame(width: 100, alignment: .leading)
                             .font(.callout)
-                        Stepper("\(appState.generationCount) 个",
-                               value: $appState.generationCount,
+                        Stepper("\(localGenerationCount) 个",
+                               value: $localGenerationCount,
                                in: 1...10) { _ in
                             interactionService.buttonPressed()
+                            Task { @MainActor in
+                                appState.generationCount = localGenerationCount
+                            }
                         }
                         .frame(maxWidth: 200)
                         .controlSize(.regular)
@@ -666,25 +733,33 @@ struct SettingsView: View {
                         .font(.headline)
                         .fontWeight(.medium)
 
-                    Toggle("启用批量生成", isOn: $appState.enableBatchGeneration)
+                    Toggle("启用批量生成", isOn: $localEnableBatchGeneration)
                         .font(.callout)
                         .padding(.vertical, 2)
+                        .onChange(of: localEnableBatchGeneration) { newValue in
+                            Task { @MainActor in
+                                appState.enableBatchGeneration = newValue
+                            }
+                        }
 
                     HStack(alignment: .center) {
                         Text("批量数量:")
                             .frame(width: 100, alignment: .leading)
                             .font(.callout)
-                        Stepper("\(appState.batchSize) 个",
-                               value: $appState.batchSize,
+                        Stepper("\(localBatchSize) 个",
+                               value: $localBatchSize,
                                in: 2...10) { _ in
                             interactionService.buttonPressed()
+                            Task { @MainActor in
+                                appState.batchSize = localBatchSize
+                            }
                         }
                         .frame(maxWidth: 200)
                         .controlSize(.regular)
-                        .disabled(!appState.enableBatchGeneration)
+                        .disabled(!localEnableBatchGeneration)
                         Spacer()
                     }
-                    .opacity(appState.enableBatchGeneration ? 1.0 : 0.6)
+                    .opacity(localEnableBatchGeneration ? 1.0 : 0.6)
                     .padding(.vertical, 2)
                 }
                 .padding(.vertical, 4)
@@ -692,6 +767,13 @@ struct SettingsView: View {
                 Spacer()
             }
             .padding(.horizontal)
+            .onAppear {
+                // 初始化本地状态变量
+                localImageQuality = appState.imageQuality
+                localGenerationCount = appState.generationCount
+                localEnableBatchGeneration = appState.enableBatchGeneration
+                localBatchSize = appState.batchSize
+            }
         }
     }
     
@@ -899,7 +981,7 @@ struct SettingsView: View {
                 .foregroundColor(hasAPIKey(for: provider) ? .green : .orange)
         }
         .padding()
-        .background(Color(.controlBackgroundColor))
+        .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(8)
     }
     
