@@ -1,0 +1,12 @@
+VERCEL DEPLOY FORCE - VERSION 2.0.1
+Build Time: 2025-11-18T03:25:00Z
+Commit: 2727050
+
+This file forces Vercel to recognize new deployment.
+Changes:
+- Fixed demo mode display issue
+- Added version.json for deployment verification
+- Enhanced vercel.json configuration
+- Ensured NEXT_PUBLIC_DEMO_MODE=true in production
+
+XIconAI - 完整AI图标生成演示

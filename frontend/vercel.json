@@ -14,11 +14,22 @@
   ],
   "env": {
     "NEXT_PUBLIC_DEMO_MODE": "true",
-    "NEXT_PUBLIC_API_URL": "https://xiconai.com"
+    "NEXT_PUBLIC_API_URL": "https://xiconai.com",
+    "NEXT_PUBLIC_APP_NAME": "XIconAI Demo",
+    "NEXT_PUBLIC_BUILD_VERSION": "2.0.1"
   },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_DEMO_MODE": "true"
+    }
+  },
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs"
 }
