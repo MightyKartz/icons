@@ -1,4 +1,5 @@
 'use client'
+// Version: 2.0 - Production deployment fix
 
 import { useState, useEffect } from 'react'
 import { Sparkles, Settings, Download, Zap, Shield, Globe } from 'lucide-react'
