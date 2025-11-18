@@ -235,22 +235,24 @@ export default function ConfigPage() {
             {/* API密钥 */}
             <div className="mb-6">
               <label className="label mb-2">API密钥</label>
-              <div className="relative">
-                <input
-                  type={showApiKey ? 'text' : 'password'}
-                  value={config.apiKey}
-                  onChange={(e) => setConfig(prev => ({ ...prev, apiKey: e.target.value }))}
-                  placeholder="输入您的API密钥"
-                  className="input pr-10 w-full"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <form onSubmit={(e) => { e.preventDefault(); testConnection(); }}>
+                <div className="relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    value={config.apiKey}
+                    onChange={(e) => setConfig(prev => ({ ...prev, apiKey: e.target.value }))}
+                    placeholder="输入您的API密钥"
+                    className="input pr-10 w-full"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
+                    {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </form>
             </div>
 
             {/* 模型选择 */}
