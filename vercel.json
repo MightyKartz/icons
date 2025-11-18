@@ -1,13 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
   "env": {
     "NEXT_PUBLIC_DEMO_MODE": "true",
     "NEXT_PUBLIC_API_URL": "https://xiconai.com",
     "NEXT_PUBLIC_APP_NAME": "XIconAI Demo",
     "NEXT_PUBLIC_BUILD_VERSION": "2.0.1"
-  },
-  "framework": "nextjs",
-  "rootDirectory": "frontend"
+  }
 }
