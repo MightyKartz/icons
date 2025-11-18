@@ -233,7 +233,7 @@ export default function DocsPage() {
                     <div className="bg-slate-900 text-slate-100 p-4 rounded-lg font-mono text-sm">
                       <div>POST /api/generate</div>
                       <div className="mt-2 text-slate-400">
-                        {{"provider": "openai", "model": "dall-e-3", "prompt": "相机图标"}}
+                        {`{"provider": "openai", "model": "dall-e-3", "prompt": "相机图标"}`}
                       </div>
                     </div>
                   </div>
