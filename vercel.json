@@ -1,4 +1,7 @@
 {
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
   "env": {
     "NEXT_PUBLIC_DEMO_MODE": "true",
     "NEXT_PUBLIC_API_URL": "https://xiconai.com",
