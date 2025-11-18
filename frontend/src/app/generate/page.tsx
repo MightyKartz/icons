@@ -80,7 +80,7 @@ export default function GeneratePage() {
       // 轮询任务状态
       pollTaskStatus(taskResponse.taskId)
     } catch (error) {
-      alert(`生成失败: ${error.message}`)
+      alert(`生成失败: ${error instanceof Error ? error.message : '未知错误'}`)
       setLoading(false)
     }
   }
