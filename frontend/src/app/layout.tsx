@@ -16,14 +16,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://xiconai.vercel.app'),
+  metadataBase: new URL('https://frontend-nu-six-29.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'XIconAI - 免费AI图标生成工具',
     description: '多平台AI图标生成工具，支持多种AI提供商',
-    url: 'https://xiconai.vercel.app',
+    url: 'https://frontend-nu-six-29.vercel.app',
     siteName: 'XIconAI',
     images: [
       {

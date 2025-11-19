@@ -309,7 +309,7 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-2">
                 <p><strong>GitHub:</strong> <a href="https://github.com/MightyKartz/icons" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">github.com/MightyKartz/icons</a></p>
-                <p><strong>项目主页:</strong> <a href="https://xiconai.vercel.app" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">xiconai.vercel.app</a></p>
+                <p><strong>项目主页:</strong> <a href="https://frontend-nu-six-29.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">frontend-nu-six-29.vercel.app</a></p>
               </div>
             </div>
           </section>
