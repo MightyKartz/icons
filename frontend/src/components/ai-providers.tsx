@@ -41,52 +41,52 @@ const providers = [
 
 export function AIProviders() {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4 mb-16">
+        <div className="text-center space-y-3 mb-12">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             支持的AI提供商
           </h2>
-          <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             选择您喜欢的AI服务，我们支持主流的AI图像生成提供商
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {providers.map((provider, index) => (
             <Card
               key={index}
               className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
             >
-              <CardContent className="p-6">
+              <CardContent className="p-5">
                 {/* Badge */}
-                <div className="absolute top-4 right-4">
-                  <Badge variant={provider.badgeVariant} className="text-xs">
+                <div className="absolute top-3 right-3">
+                  <Badge variant={provider.badgeVariant} className="text-xs px-2 py-0.5">
                     {provider.badge}
                   </Badge>
                 </div>
 
                 {/* Provider Info */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
+                    <h3 className="text-base font-semibold text-foreground mb-1">
                       {provider.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground font-medium">
+                    <p className="text-xs text-muted-foreground font-medium">
                       {provider.model}
                     </p>
                   </div>
 
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     {provider.description}
                   </p>
 
                   {/* Features */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {provider.features.map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
+                        <Check className="h-3 w-3 text-green-500" />
+                        <span className="text-xs text-muted-foreground">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -99,11 +99,11 @@ export function AIProviders() {
           ))}
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
-            <Zap className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">
+        {/* CTA Section - 优化间距 */}
+        <div className="text-center mt-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full">
+            <Zap className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-primary">
               更多AI提供商正在开发中
             </span>
           </div>

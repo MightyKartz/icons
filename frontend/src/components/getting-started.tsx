@@ -33,51 +33,51 @@ const steps = [
 
 export function GettingStarted() {
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-4 mb-16">
+        <div className="text-center space-y-3 mb-12">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             快速开始
           </h2>
-          <p className="mx-auto max-w-2xl text-xl text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             简单三步，轻松生成专业图标
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {steps.map((step, index) => (
             <div key={index} className="relative">
               {/* Step Number */}
-              <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold z-10">
+              <div className="absolute -top-3 -left-3 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold z-10">
                 {step.number}
               </div>
 
               {/* Step Card */}
               <Card className="relative h-full border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-6 pt-8">
+                <CardContent className="p-5 pt-6">
                   {/* Icon */}
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 text-primary mb-6">
-                    <step.icon className="h-6 w-6" />
+                  <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary mb-4">
+                    <step.icon className="h-5 w-5" />
                   </div>
 
                   {/* Content */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div>
-                      <h3 className="text-xl font-semibold text-foreground mb-2">
+                      <h3 className="text-base font-semibold text-foreground mb-2">
                         {step.title}
                       </h3>
-                      <p className="text-muted-foreground">
+                      <p className="text-xs text-muted-foreground leading-relaxed">
                         {step.description}
                       </p>
                     </div>
 
                     {/* Tips */}
                     <div className="space-y-2">
-                      <div className="text-sm font-medium text-foreground">小贴士：</div>
+                      <div className="text-xs font-medium text-foreground">小贴士：</div>
                       <ul className="space-y-1">
                         {step.tips.map((tip, tipIndex) => (
-                          <li key={tipIndex} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                          <li key={tipIndex} className="text-xs text-muted-foreground flex items-start gap-2">
+                            <div className="w-1 h-1 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                             {tip}
                           </li>
                         ))}
@@ -89,27 +89,27 @@ export function GettingStarted() {
 
               {/* Arrow Connector */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-20">
-                  <ArrowRight className="h-6 w-6 text-muted-foreground" />
+                <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-20">
+                  <ArrowRight className="h-5 w-5 text-muted-foreground" />
                 </div>
               )}
             </div>
           ))}
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center mt-16 space-y-4">
-          <p className="text-muted-foreground">
+        {/* CTA Section - 优化间距 */}
+        <div className="text-center mt-12 space-y-3">
+          <p className="text-sm text-muted-foreground">
             准备好开始创建您的第一个AI图标了吗？
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button size="lg" className="px-6 py-2.5 text-base font-medium" asChild>
               <Link href="/config">
-                <Settings className="mr-2 h-5 w-5" />
+                <Settings className="mr-2 h-4 w-4" />
                 立即开始
               </Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="outline" size="lg" className="px-6 py-2.5 text-base font-medium" asChild>
               <Link href="/docs">
                 查看详细文档
               </Link>
