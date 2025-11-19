@@ -76,6 +76,7 @@ export function HeroSection() {
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed">
               支持多种AI提供商，完全免费开源，数据本地存储，保护您的隐私。
               一键生成高质量图标，让创意变为现实。
+              <span className="text-red-500 font-bold">[VERCEL SYNC TEST - COMMIT: a9b1d4d]</span>
             </p>
           </div>
 
