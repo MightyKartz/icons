@@ -11,7 +11,7 @@ import ErrorBoundary from '@/components/error-boundary'
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <NavigationHeader />
       <main>
         <ErrorBoundary>
@@ -25,6 +25,6 @@ export default function HomePage() {
         </ErrorBoundary>
       </main>
       <Footer />
-    </div>
+    </>
   )
 }

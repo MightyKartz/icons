@@ -25,6 +25,13 @@ const mockProviders = [
     models: ["stable-diffusion-xl", "stable-diffusion-3"],
     description: "开源图像生成模型",
     pricing: "付费"
+  },
+  {
+    id: "custom",
+    name: "自定义",
+    models: ["gpt-4o", "gpt-4", "qwen-vl-plus", "wanx-v1", "flux-schnell"],
+    description: "支持OpenAI、ModelScope等兼容格式的API服务",
+    pricing: "自定义"
   }
 ]
 

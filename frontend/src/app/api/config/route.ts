@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { demoStore } from '@/lib/demo-store'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787'
 const IS_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
 
-// 演示模式的内存存储
-let demoConfig: any = null
-
 export async function GET(request: NextRequest) {
   if (IS_DEMO_MODE) {
-    // 演示模式下，如果没有配置就返回默认配置，让用户能看到完整界面
-    if (demoConfig) {
+    // 演示模式下，从demoStore获取配置
+    const config = demoStore.getConfig()
+
+    if (config) {
       return NextResponse.json({
-        ...demoConfig,
+        ...config,
         apiKey: '' // 不返回实际的API密钥
       })
     }
@@ -53,9 +53,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const body = await request.json()
 
-  // 演示模式直接保存到内存
+  // 演示模式保存到demoStore
   if (IS_DEMO_MODE) {
-    demoConfig = { ...body, apiKey: '***demo***' }
+    demoStore.saveConfig(body)
     return NextResponse.json({ success: true })
   }
 
@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  // 演示模式直接清除内存
+  // 演示模式清除demoStore中的配置
   if (IS_DEMO_MODE) {
-    demoConfig = null
+    demoStore.clearConfig()
     return NextResponse.json({ success: true })
   }
 

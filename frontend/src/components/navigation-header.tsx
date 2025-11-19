@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Sparkles, Settings, Menu, X, Github, ExternalLink } from 'lucide-react'
+import { Sparkles, Settings, Menu, X, Github, ExternalLink, Apple, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -57,6 +57,24 @@ export function NavigationHeader() {
             </Button>
           </Link>
 
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-black hover:bg-gray-800 text-white hidden sm:flex"
+            asChild
+          >
+            <a
+              href="https://apps.apple.com/cn/app/xiconai-studio/id6754810915?mt=12"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center"
+            >
+              <Apple className="mr-2 h-4 w-4" />
+              <span className="hidden lg:inline">App Store</span>
+              <span className="lg:hidden">下载</span>
+            </a>
+          </Button>
+
           <Button variant="outline" size="sm" asChild>
             <Link href="/config">
               <Settings className="mr-2 h-4 w-4" />
@@ -95,6 +113,19 @@ export function NavigationHeader() {
                   {item.name}
                 </Link>
               ))}
+
+              {/* App Store Download Link */}
+              <a
+                href="https://apps.apple.com/cn/app/xiconai-studio/id6754810915?mt=12"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm font-medium text-black hover:text-gray-700 py-2 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Apple className="mr-2 h-4 w-4" />
+                App Store 下载
+                <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
             </div>
           </nav>
         </div>

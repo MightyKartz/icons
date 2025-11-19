@@ -22,20 +22,20 @@ const providers = [
     features: ['理解力强', '细节丰富', '创意独特']
   },
   {
-    name: 'ModelScope',
-    model: '免费使用',
-    description: '完全免费的AI图像生成服务',
-    badge: '免费',
-    badgeVariant: 'outline' as const,
-    features: ['零成本', '无限使用', '中文友好']
-  },
-  {
     name: 'Stability AI',
     model: 'Stable Diffusion',
     description: '开源的图像生成模型',
     badge: '开源',
     badgeVariant: 'secondary' as const,
     features: ['可定制', '社区支持', '风格多样']
+  },
+  {
+    name: '自定义',
+    model: '自定义API',
+    description: '支持OpenAI、ModelScope等兼容格式的API服务',
+    badge: '自定义',
+    badgeVariant: 'outline' as const,
+    features: ['灵活配置', '兼容性强', '支持ModelScope']
   }
 ]
 

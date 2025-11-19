@@ -20,7 +20,7 @@ export function HeroSection() {
         }
       } catch (err) {
         // 静默处理错误，不影响页面渲染
-        console.log('配置检查:', err.message)
+        console.log('配置检查:', err instanceof Error ? err.message : String(err))
       }
     }
 

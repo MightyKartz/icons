@@ -61,12 +61,24 @@ export default function GeneratePage() {
     setCurrentTask(null)
 
     try {
+      // 获取配置信息
+      const configResponse = await fetch('/api/config')
+      const config = configResponse.ok ? await configResponse.json() : {}
+
+      const requestBody = {
+        ...request,
+        provider: config.provider || 'openai',
+        model: config.model || 'dall-e-3',
+        baseUrl: config.baseUrl,
+        apiKey: config.apiKey
+      }
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify(requestBody),
       })
 
       if (!response.ok) {
@@ -77,8 +89,9 @@ export default function GeneratePage() {
       const taskResponse = await response.json()
       setCurrentTask(taskResponse)
 
-      // 轮询任务状态
-      pollTaskStatus(taskResponse.taskId)
+      // 轮询任务状态，支持两种响应格式
+      const taskId = taskResponse.task_id || taskResponse.taskId
+      pollTaskStatus(taskId)
     } catch (error) {
       alert(`生成失败: ${error instanceof Error ? error.message : '未知错误'}`)
       setLoading(false)
@@ -86,7 +99,7 @@ export default function GeneratePage() {
   }
 
   const pollTaskStatus = async (taskId: string) => {
-    const maxAttempts = 60 // 最多轮询60次（约2分钟）
+    const maxAttempts = 180 // 最多轮询180次（约15分钟），ModelScope需要更长时间
     let attempts = 0
 
     const poll = async () => {
@@ -98,20 +111,33 @@ export default function GeneratePage() {
           throw new Error('获取任务状态失败')
         }
 
-        const taskStatus: TaskStatus = await response.json()
+        const taskStatus = await response.json()
         setCurrentTask(taskStatus)
 
-        if (taskStatus.status === 'completed') {
+        // 检查状态字段（支持标准格式和ModelScope格式）
+        const status = taskStatus.task_status || taskStatus.status
+
+        if (status === 'completed' || status === 'SUCCEED') {
           setLoading(false)
-          if (taskStatus.result) {
+
+          // 处理不同格式的响应
+          if (taskStatus.output_images && Array.isArray(taskStatus.output_images)) {
+            // ModelScope格式
+            const images = taskStatus.output_images.map((url: string) => ({ url }))
+            setGeneratedImages(prev => [...images, ...prev])
+          } else if (taskStatus.image_url) {
+            // 简单格式
+            setGeneratedImages(prev => [{ url: taskStatus.image_url }, ...prev])
+          } else if (taskStatus.result) {
+            // 标准格式
             setGeneratedImages(prev => [taskStatus.result, ...prev])
           }
-        } else if (taskStatus.status === 'failed') {
+        } else if (status === 'failed' || status === 'FAILED') {
           setLoading(false)
           alert(`生成失败: ${taskStatus.error}`)
-        } else if (taskStatus.status === 'pending' || taskStatus.status === 'processing') {
+        } else if (status === 'pending' || status === 'processing' || status === 'RUNNING') {
           if (attempts < maxAttempts) {
-            setTimeout(poll, 2000) // 每2秒轮询一次
+            setTimeout(poll, 5000) // ModelScope建议每5秒轮询一次
           } else {
             setLoading(false)
             alert('生成超时，请重试')
@@ -120,7 +146,7 @@ export default function GeneratePage() {
       } catch (error) {
         console.error('轮询任务状态失败:', error)
         if (attempts < maxAttempts) {
-          setTimeout(poll, 2000)
+          setTimeout(poll, 5000) // 每5秒轮询一次
         } else {
           setLoading(false)
           alert('获取任务状态失败，请重试')
@@ -243,8 +269,6 @@ export default function GeneratePage() {
                 >
                   <option value="512x512">512x512</option>
                   <option value="1024x1024">1024x1024</option>
-                  <option value="1024x1792">1024x1792</option>
-                  <option value="1792x1024">1792x1024</option>
                 </select>
               </div>
 
@@ -291,9 +315,21 @@ export default function GeneratePage() {
                         <Loader2 className="h-4 w-4 animate-spin" />
                       )}
                       <span className="text-sm text-gray-600 dark:text-gray-300">
-                        任务状态: {currentTask.status === 'pending' ? '等待中' :
-                                   currentTask.status === 'processing' ? '处理中' :
-                                   currentTask.status === 'completed' ? '已完成' : '失败'}
+                        任务状态: {
+                          (() => {
+                            const status = currentTask.status
+                            switch (status) {
+                              case 'pending': return '等待中'
+                              case 'processing': return '处理中'
+                              case 'RUNNING': return '运行中'
+                              case 'completed': return '已完成'
+                              case 'SUCCEED': return '已完成'
+                              case 'failed': return '失败'
+                              case 'FAILED': return '失败'
+                              default: return status || '未知状态'
+                            }
+                          })()
+                        }
                       </span>
                     </div>
                   </div>

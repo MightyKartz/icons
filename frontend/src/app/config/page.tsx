@@ -79,7 +79,7 @@ export default function ConfigPage() {
       setConfig(prev => ({
         ...prev,
         provider,
-        model: selectedProvider.models[0] || '',
+        model: provider === 'custom' ? '' : (selectedProvider.models[0] || ''),
         baseUrl: selectedProvider.baseUrl || '',
       }))
       setTestResult(null)
@@ -109,6 +109,16 @@ export default function ConfigPage() {
       return
     }
 
+    if (config.provider === 'custom' && !config.baseUrl?.trim()) {
+      setTestResult({ success: false, message: '自定义提供商需要填写基础URL' })
+      return
+    }
+
+    if (config.provider === 'custom' && !config.model?.trim()) {
+      setTestResult({ success: false, message: '自定义提供商需要填写模型名称' })
+      return
+    }
+
     setTesting(true)
     setTestResult(null)
 
@@ -133,6 +143,16 @@ export default function ConfigPage() {
   const saveConfig = async () => {
     if (!config.apiKey.trim()) {
       alert('请输入API密钥')
+      return
+    }
+
+    if (config.provider === 'custom' && !config.baseUrl?.trim()) {
+      alert('自定义提供商需要填写基础URL')
+      return
+    }
+
+    if (config.provider === 'custom' && !config.model?.trim()) {
+      alert('自定义提供商需要填写模型名称')
       return
     }
 
@@ -257,20 +277,58 @@ export default function ConfigPage() {
 
             {/* 模型选择 */}
             <div className="mb-6">
-              <label className="label mb-2">模型</label>
-              <select
-                value={config.model}
-                onChange={(e) => setConfig(prev => ({ ...prev, model: e.target.value }))}
-                className="select w-full"
-              >
-                {providers
-                  .find(p => p.id === config.provider)
-                  ?.models.map((model) => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
-                  )) || []}
-              </select>
+              <label className="label mb-2">
+                模型
+                {config.provider === 'custom' && <span className="text-red-500 ml-1">*</span>}
+              </label>
+              {config.provider === 'custom' ? (
+                <div>
+                  <input
+                    type="text"
+                    value={config.model}
+                    onChange={(e) => setConfig(prev => ({ ...prev, model: e.target.value }))}
+                    placeholder="输入模型ID，如：Qwen/Qwen-Image, AI-ModelScope/flux-schnell"
+                    className={`input w-full ${
+                      !config.model?.trim() ? 'border-red-300 focus:border-red-500' : ''
+                    }`}
+                    required
+                  />
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">常用模型示例：</p>
+                    <div className="flex flex-wrap gap-1">
+                      {['Qwen/Qwen-Image', 'AI-ModelScope/flux-schnell', 'AI-ModelScope/stable-diffusion-v1-5', 'gpt-4', 'dall-e-3'].map((model) => (
+                        <button
+                          key={model}
+                          type="button"
+                          onClick={() => setConfig(prev => ({ ...prev, model }))}
+                          className="text-xs px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded transition-colors"
+                        >
+                          {model}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <select
+                  value={config.model}
+                  onChange={(e) => setConfig(prev => ({ ...prev, model: e.target.value }))}
+                  className="select w-full"
+                >
+                  {providers
+                    .find(p => p.id === config.provider)
+                    ?.models.map((model) => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    )) || []}
+                </select>
+              )}
+              {config.provider === 'custom' && (
+                <p className="text-xs text-gray-500 mt-1">
+                  自定义提供商需要手动指定模型名称
+                </p>
+              )}
             </div>
 
             {/* 高级配置 */}
@@ -282,14 +340,31 @@ export default function ConfigPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 自定义基础URL */}
                 <div>
-                  <label className="label mb-2">自定义基础URL（可选）</label>
+                  <label className="label mb-2">
+                    自定义基础URL
+                    {config.provider === 'custom' && <span className="text-red-500 ml-1">*</span>}
+                  </label>
                   <input
                     type="url"
                     value={config.baseUrl || ''}
                     onChange={(e) => setConfig(prev => ({ ...prev, baseUrl: e.target.value }))}
-                    placeholder="https://api.example.com/v1"
-                    className="input w-full"
+                    placeholder={
+                      config.provider === 'custom'
+                        ? "https://api-inference.modelscope.cn/v1"
+                        : "留空使用默认URL"
+                    }
+                    className={`input w-full ${
+                      config.provider === 'custom' && !config.baseUrl?.trim()
+                        ? 'border-red-300 focus:border-red-500'
+                        : ''
+                    }`}
+                    required={config.provider === 'custom'}
                   />
+                  {config.provider === 'custom' && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      ModelScope: https://api-inference.modelscope.cn/v1
+                    </p>
+                  )}
                 </div>
 
                 {/* 最大Token数 */}
@@ -385,6 +460,7 @@ export default function ConfigPage() {
             )}
           </div>
 
+          
           {/* 提供商信息 */}
           <div className="card p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">

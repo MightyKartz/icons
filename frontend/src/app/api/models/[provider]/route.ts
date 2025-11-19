@@ -9,6 +9,31 @@ export async function GET(
   try {
     const { provider } = params
 
+    // 自定义提供商返回预定义的模型列表
+    if (provider === 'custom') {
+      return NextResponse.json({
+        models: [
+          "gpt-4o",
+          "gpt-4",
+          "gpt-3.5-turbo",
+          "claude-3-opus",
+          "claude-3-sonnet",
+          "stable-diffusion-xl",
+          "stable-diffusion-3",
+          "dall-e-3",
+          "dall-e-2",
+          "Qwen/Qwen-Image",
+          "AI-ModelScope/stable-diffusion-v1-5",
+          "AI-ModelScope/stable-diffusion-xl-base-1.0",
+          "AI-ModelScope/flux-schnell",
+          "AI-ModelScope/flux-dev",
+          "qwen-vl-plus",
+          "qwen-vl-max",
+          "wanx-v1"
+        ]
+      })
+    }
+
     const response = await fetch(`${API_BASE_URL}/v1/models/${provider}`, {
       headers: {
         'Content-Type': 'application/json',

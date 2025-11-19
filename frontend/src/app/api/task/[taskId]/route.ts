@@ -22,17 +22,36 @@ export async function GET(
         )
       }
 
-      return NextResponse.json({
-        task_id: task.id,
-        status: task.status,
-        image_url: task.imageUrl,
-        error: task.error,
-        created_at: task.createdAt,
-        completed_at: task.completedAt,
-        prompt: task.prompt,
-        provider: task.provider,
-        model: task.model
-      })
+      // 检测是否为ModelScope任务
+      const isModelScope = task.provider === 'custom' &&
+        (task.model?.includes('Qwen/') || task.model?.includes('AI-ModelScope/'))
+
+      if (isModelScope) {
+        // ModelScope格式响应
+        return NextResponse.json({
+          task_id: task.id,
+          task_status: task.status, // ModelScope使用task_status
+          output_images: task.output_images || (task.imageUrl ? [task.imageUrl] : []),
+          error: task.error,
+          created_at: task.createdAt,
+          completed_at: task.completedAt,
+          prompt: task.prompt,
+          model: task.model
+        })
+      } else {
+        // 标准格式响应
+        return NextResponse.json({
+          task_id: task.id,
+          status: task.status,
+          image_url: task.imageUrl,
+          error: task.error,
+          created_at: task.createdAt,
+          completed_at: task.completedAt,
+          prompt: task.prompt,
+          provider: task.provider,
+          model: task.model
+        })
+      }
     }
 
     const response = await fetch(`${API_BASE_URL}/v1/task/${taskId}`, {
